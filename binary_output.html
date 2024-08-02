@@ -1,0 +1,155 @@
+<style>
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+    
+    td, th {
+      border: 1px solid #dddddd;
+      text-align: center;
+      padding: 8px;
+    }
+    
+    tr:nth-child(even) {
+      background-color: #dddddd;
+    }
+</style>
+
+<script type="text/javascript">
+    var pinConfig;
+
+    function editPin(obj, type, id){
+        if(type==="pinname"){
+            pinConfig[id][0] = obj.value;
+        }else if(type==="pinnum"){
+            pinConfig[id][1] = obj.value;
+        }else if(type==="pintype"){
+            pinConfig[id][2] = obj.value;
+        }else if(type==="pindur"){
+            pinConfig[id][3] = obj.value;
+        }
+    }
+
+    RED.nodes.registerType('Binary Output',{
+        category: 'Tauri S',
+        color:"#E35253",
+        defaults: {
+            modname: {value: ""},
+            modnum: {value:0},
+            busnum: {value:0},
+            serialnum: {value:""},
+            pinConfig: {value:[["Signal 0", 0, "cmd", 0]]},
+        },
+        inputs: 1,
+        outputs: 3,
+        icon: "serial.svg",
+        label: "Binary Output",
+        oneditprepare: function() {
+            //global variable
+            pinConfig = this.pinConfig;
+
+            //I/O Number initial set
+            if (this.iono === undefined) {
+                $("#node-input-iono").val(pinConfig.length);
+                $("#signal-table").append('<tr><th>Signalname</th><th>I/O</th><th>Type</th><th>Duration</th></tr>');
+                for(let i=0; i<pinConfig.length; i++){
+                    let pinState = pinConfig[i];
+                    $("#signal-table").append(`<tr>
+                        <td><input onchange="editPin(this, 'pinname',`+i+`)" type="text" id="node-input-modname" style="width:100px; border: none; background-color:transparent; color: black;" value="`+pinState[0]+`"></td>
+                        <td align="center"><input onchange="editPin(this, 'pinnum',`+i+`)" type="text" id="node-input-name" style="width:40px; background-color:transparent; color: black; border: none; text-align: center;" value="`+pinState[1]+`"></td>
+                        <td><select onchange="editPin(this, 'pintype',`+i+`)" type="text" value="`+pinState[2]+`" id="node-input-intype" style="width:60px;background-color:transparent; color: black; border: none;">
+                            <option value="cmd">CMD</option>
+                            <option value="info">INFO</option>
+                        </select></td>
+                        <td align="center"><input onchange="editPin(this, 'pindur',`+i+`)" type="text" id="node-input-name" style="width:40px; background-color:transparent; color: black; border: none; text-align: center;" value="`+pinState[3]+`"></td>
+                        </tr>`);
+                }
+            }
+
+            //Module Number dynamic set
+            $("#node-input-modnum").spinner({
+                min:0,
+                max:15
+            });
+
+            //Bus Port dynamic set
+            $("#node-input-busnum").spinner({
+                min:0,
+                max:4
+            });
+
+            //type dynamic set
+            $("#node-input-intype").on("change", function() {
+                var type = $("#node-input-intype").val();
+                console.log(type);
+            });
+
+            //I/O Number dynamic set
+            $("#node-input-iono").spinner({
+                min:0,
+                max:16,
+                spin: function(event, value){
+                    $("#signal-table").empty();
+                    $("#signal-table").append('<tr><th>Signalname</th><th>I/O</th><th>Type</th><th>Duration</th></tr>');
+
+                    plen = pinConfig.length;
+                    if(plen < value.value){
+                        pinConfig.push(["Signal "+plen, plen, "cmd", 0]);
+                    }else{
+                        pinConfig.pop();
+                    }
+                    this.pinConfig = pinConfig;
+
+                    for(let i=0; i<pinConfig.length; i++){
+                        let pinState = pinConfig[i];
+                        $("#signal-table").append(`<tr>
+                            <td><input onchange="editPin(this, 'pinname',`+i+`)" type="text" id="node-input-modname" style="width:100px; border: none; background-color:transparent; color: black;" value="`+pinState[0]+`"></td>
+                            <td align="center"><input onchange="editPin(this, 'pinnum',`+i+`)" type="text" id="node-input-name" style="width:40px; background-color:transparent; color: black; border: none; text-align: center;" value="`+pinState[1]+`"></td>
+                            <td><select onchange="editPin(this, 'pintype',`+i+`)" type="text" value="`+pinState[2]+`" id="node-input-intype" style="width:60px;background-color:transparent; color: black; border: none;">
+                                <option value="cmd">CMD</option>
+                                <option value="info">INFO</option>
+                            </select></td>
+                            <td align="center"><input onchange="editPin(this, 'pindur',`+i+`)" type="text" id="node-input-name" style="width:40px; background-color:transparent; color: black; border: none; text-align: center;" value="`+pinState[3]+`"></td>
+                            </tr>`);
+                    }
+                }
+            });
+        },
+        oneditsave: function(){
+            this.pinConfig = pinConfig;
+        }
+    });
+</script>
+
+
+<script type="text/html" data-template-name="Binary Output">
+    <div class="form-row">
+        <label for="node-input-modname">Module Name</label>
+        <input type="text" id="node-input-modname" placeholder="DO Modul 01">
+    </div>
+    <div class="form-row">
+        <label for="node-input-modnum">Module Number</label>
+        <input id="node-input-modnum" class="I2C-in-address" placeholder="[msg.bus]" min=0 max=7 style="width:40px; height:16px;">
+    </div>
+    <div class="form-row">
+        <label for="node-input-busnum">Bus Number</label>
+        /dev/i2c- <input id="node-input-busnum" class="I2C-in-address" placeholder="[msg.bus]" min=0 max=7 style="width:40px; height:16px;">
+    </div>
+    <div class="form-row">
+        <label for="node-input-serialnum">Serial Number</label>
+        <input type="text" id="node-input-serialnum" placeholder="0x47A0">
+    </div>
+    <div class="form-row">
+        <label for="node-input-iono">Number of I/Os</label>
+        <input id="node-input-iono" class="I2C-in-address" placeholder="[msg.bus]" min=0 max=7 style="width:40px; height:16px;">
+    </div>
+    <table id="signal-table">
+    </table>
+
+</script>
+
+<script type="text/html" data-help-name="Binary Output">
+    <p>Output 1: Outputs the status of all IO Pins by every change and if msg.input equals "Pinstatus"</p>
+    <p>Output 2: Diagnostic, outputs all relevant information that can be requested via the input</p>
+    <p>Output 3: Module Error, outputs all relevant errors</p>
+</script>

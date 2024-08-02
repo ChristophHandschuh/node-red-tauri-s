@@ -1,0 +1,13 @@
+{
+  "name": "tauri-s-nodes",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "node-red" : {
+      "nodes": {
+          "binary_output": "binary_output.js"
+      }
+  },
+  "author": "",
+  "license": "ISC"
+}
