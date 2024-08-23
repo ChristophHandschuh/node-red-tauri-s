@@ -27,6 +27,8 @@
             pinConfig[id][2] = obj.value;
         }else if(type==="pindur"){
             pinConfig[id][3] = obj.value;
+        }else if(type==="inv"){
+            pinConfig[id][4] = obj.value;
         }
     }
 
@@ -38,7 +40,7 @@
             modnum: {value:0},
             busnum: {value:0},
             serialnum: {value:""},
-            pinConfig: {value:[["Signal 0", 0, "cmd", 0]]},
+            pinConfig: {value:[["Signal 0", 0, "info", 0, "normal"]]},
         },
         inputs: 1,
         outputs: 3,
@@ -51,25 +53,73 @@
             //I/O Number initial set
             if (this.iono === undefined) {
                 $("#node-input-iono").val(pinConfig.length);
-                $("#signal-table").append('<tr><th>Signalname</th><th>I/O</th><th>Type</th><th>Duration</th></tr>');
+                $("#signal-table").append('<tr><th>Signalname</th><th>I/O</th><th>Type</th><th>Duration</th><th>Invert</th></tr>');
                 for(let i=0; i<pinConfig.length; i++){
                     let pinState = pinConfig[i];
-                    $("#signal-table").append(`<tr>
+                    if(pinState[2] == "cmd" && pinState[4] == "normal"){
+                        $("#signal-table").append(`<tr>
                         <td><input onchange="editPin(this, 'pinname',`+i+`)" type="text" id="node-input-modname" style="width:100px; border: none; background-color:transparent; color: black;" value="`+pinState[0]+`"></td>
                         <td align="center"><input onchange="editPin(this, 'pinnum',`+i+`)" type="text" id="node-input-name" style="width:40px; background-color:transparent; color: black; border: none; text-align: center;" value="`+pinState[1]+`"></td>
-                        <td><select onchange="editPin(this, 'pintype',`+i+`)" type="text" value="`+pinState[2]+`" id="node-input-intype" style="width:60px;background-color:transparent; color: black; border: none;">
-                            <option value="cmd">CMD</option>
+                        <td><select onchange="editPin(this, 'pintype',`+i+`)" type="text" id="node-input-intype" style="width:60px;background-color:transparent; color: black; border: none;">
+                            <option selected value="cmd">CMD</option>
                             <option value="info">INFO</option>
                         </select></td>
                         <td align="center"><input onchange="editPin(this, 'pindur',`+i+`)" type="text" id="node-input-name" style="width:40px; background-color:transparent; color: black; border: none; text-align: center;" value="`+pinState[3]+`"></td>
+                        <td><select onchange="editPin(this, 'inv',`+i+`)" type="text" id="node-input-intype" style="width:70px;background-color:transparent; color: black; border: none;">
+                            <option selected value="normal">Normal</option>
+                            <option value="inverted">Inverted</option>
+                        </select></td>
                         </tr>`);
+                    }else if(pinState[2] == "cmd" && pinState[4] == "inverted"){
+                        $("#signal-table").append(`<tr>
+                        <td><input onchange="editPin(this, 'pinname',`+i+`)" type="text" id="node-input-modname" style="width:100px; border: none; background-color:transparent; color: black;" value="`+pinState[0]+`"></td>
+                        <td align="center"><input onchange="editPin(this, 'pinnum',`+i+`)" type="text" id="node-input-name" style="width:40px; background-color:transparent; color: black; border: none; text-align: center;" value="`+pinState[1]+`"></td>
+                        <td><select onchange="editPin(this, 'pintype',`+i+`)" type="text" id="node-input-intype" style="width:60px;background-color:transparent; color: black; border: none;">
+                            <option selected value="cmd">CMD</option>
+                            <option value="info">INFO</option>
+                        </select></td>
+                        <td align="center"><input onchange="editPin(this, 'pindur',`+i+`)" type="text" id="node-input-name" style="width:40px; background-color:transparent; color: black; border: none; text-align: center;" value="`+pinState[3]+`"></td>
+                        <td><select onchange="editPin(this, 'inv',`+i+`)" type="text" id="node-input-intype" style="width:70px;background-color:transparent; color: black; border: none;">
+                            <option value="normal">Normal</option>
+                            <option selected value="inverted">Inverted</option>
+                        </select></td>
+                        </tr>`);
+                    }else if(pinState[2] == "info" && pinState[4] == "normal"){
+                        $("#signal-table").append(`<tr>
+                        <td><input onchange="editPin(this, 'pinname',`+i+`)" type="text" id="node-input-modname" style="width:100px; border: none; background-color:transparent; color: black;" value="`+pinState[0]+`"></td>
+                        <td align="center"><input onchange="editPin(this, 'pinnum',`+i+`)" type="text" id="node-input-name" style="width:40px; background-color:transparent; color: black; border: none; text-align: center;" value="`+pinState[1]+`"></td>
+                        <td><select onchange="editPin(this, 'pintype',`+i+`)" type="text" id="node-input-intype" style="width:60px;background-color:transparent; color: black; border: none;">
+                            <option value="cmd">CMD</option>
+                            <option selected value="info">INFO</option>
+                        </select></td>
+                        <td align="center"><input onchange="editPin(this, 'pindur',`+i+`)" type="text" id="node-input-name" style="width:40px; background-color:transparent; color: black; border: none; text-align: center;" value="`+pinState[3]+`"></td>
+                        <td><select onchange="editPin(this, 'inv',`+i+`)" type="text" id="node-input-intype" style="width:70px;background-color:transparent; color: black; border: none;">
+                            <option selected value="normal">Normal</option>
+                            <option value="inverted">Inverted</option>
+                        </select></td>
+                        </tr>`);
+                    }else{
+                        $("#signal-table").append(`<tr>
+                        <td><input onchange="editPin(this, 'pinname',`+i+`)" type="text" id="node-input-modname" style="width:100px; border: none; background-color:transparent; color: black;" value="`+pinState[0]+`"></td>
+                        <td align="center"><input onchange="editPin(this, 'pinnum',`+i+`)" type="text" id="node-input-name" style="width:40px; background-color:transparent; color: black; border: none; text-align: center;" value="`+pinState[1]+`"></td>
+                        <td><select onchange="editPin(this, 'pintype',`+i+`)" type="text" id="node-input-intype" style="width:60px;background-color:transparent; color: black; border: none;">
+                            <option value="cmd">CMD</option>
+                            <option selected value="info">INFO</option>
+                        </select></td>
+                        <td align="center"><input onchange="editPin(this, 'pindur',`+i+`)" type="text" id="node-input-name" style="width:40px; background-color:transparent; color: black; border: none; text-align: center;" value="`+pinState[3]+`"></td>
+                        <td><select onchange="editPin(this, 'inv',`+i+`)" type="text" id="node-input-intype" style="width:70px;background-color:transparent; color: black; border: none;">
+                            <option value="normal">Normal</option>
+                            <option selected value="inverted">Inverted</option>
+                        </select></td>
+                        </tr>`);
+                    }
                 }
             }
 
             //Module Number dynamic set
             $("#node-input-modnum").spinner({
                 min:0,
-                max:15
+                max:11
             });
 
             //Bus Port dynamic set
@@ -90,11 +140,11 @@
                 max:16,
                 spin: function(event, value){
                     $("#signal-table").empty();
-                    $("#signal-table").append('<tr><th>Signalname</th><th>I/O</th><th>Type</th><th>Duration</th></tr>');
+                    $("#signal-table").append('<tr><th>Signalname</th><th>I/O</th><th>Type</th><th>Duration</th><th>Invert</th></tr>');
 
                     plen = pinConfig.length;
                     if(plen < value.value){
-                        pinConfig.push(["Signal "+plen, plen, "cmd", 0]);
+                        pinConfig.push(["Signal "+plen, plen, "info", 0, "normal"]);
                     }else{
                         pinConfig.pop();
                     }
@@ -102,15 +152,63 @@
 
                     for(let i=0; i<pinConfig.length; i++){
                         let pinState = pinConfig[i];
-                        $("#signal-table").append(`<tr>
+                        if(pinState[2] == "cmd" && pinState[4] == "normal"){
+                            $("#signal-table").append(`<tr>
                             <td><input onchange="editPin(this, 'pinname',`+i+`)" type="text" id="node-input-modname" style="width:100px; border: none; background-color:transparent; color: black;" value="`+pinState[0]+`"></td>
                             <td align="center"><input onchange="editPin(this, 'pinnum',`+i+`)" type="text" id="node-input-name" style="width:40px; background-color:transparent; color: black; border: none; text-align: center;" value="`+pinState[1]+`"></td>
-                            <td><select onchange="editPin(this, 'pintype',`+i+`)" type="text" value="`+pinState[2]+`" id="node-input-intype" style="width:60px;background-color:transparent; color: black; border: none;">
-                                <option value="cmd">CMD</option>
+                            <td><select onchange="editPin(this, 'pintype',`+i+`)" type="text" id="node-input-intype" style="width:60px;background-color:transparent; color: black; border: none;">
+                                <option selected value="cmd">CMD</option>
                                 <option value="info">INFO</option>
                             </select></td>
                             <td align="center"><input onchange="editPin(this, 'pindur',`+i+`)" type="text" id="node-input-name" style="width:40px; background-color:transparent; color: black; border: none; text-align: center;" value="`+pinState[3]+`"></td>
+                            <td><select onchange="editPin(this, 'inv',`+i+`)" type="text" id="node-input-intype" style="width:70px;background-color:transparent; color: black; border: none;">
+                                <option selected value="normal">Normal</option>
+                                <option value="inverted">Inverted</option>
+                            </select></td>
                             </tr>`);
+                        }else if(pinState[2] == "cmd" && pinState[4] == "inverted"){
+                            $("#signal-table").append(`<tr>
+                            <td><input onchange="editPin(this, 'pinname',`+i+`)" type="text" id="node-input-modname" style="width:100px; border: none; background-color:transparent; color: black;" value="`+pinState[0]+`"></td>
+                            <td align="center"><input onchange="editPin(this, 'pinnum',`+i+`)" type="text" id="node-input-name" style="width:40px; background-color:transparent; color: black; border: none; text-align: center;" value="`+pinState[1]+`"></td>
+                            <td><select onchange="editPin(this, 'pintype',`+i+`)" type="text" id="node-input-intype" style="width:60px;background-color:transparent; color: black; border: none;">
+                                <option selected value="cmd">CMD</option>
+                                <option value="info">INFO</option>
+                            </select></td>
+                            <td align="center"><input onchange="editPin(this, 'pindur',`+i+`)" type="text" id="node-input-name" style="width:40px; background-color:transparent; color: black; border: none; text-align: center;" value="`+pinState[3]+`"></td>
+                            <td><select onchange="editPin(this, 'inv',`+i+`)" type="text" id="node-input-intype" style="width:70px;background-color:transparent; color: black; border: none;">
+                                <option value="normal">Normal</option>
+                                <option selected value="inverted">Inverted</option>
+                            </select></td>
+                            </tr>`);
+                        }else if(pinState[2] == "info" && pinState[4] == "normal"){
+                            $("#signal-table").append(`<tr>
+                            <td><input onchange="editPin(this, 'pinname',`+i+`)" type="text" id="node-input-modname" style="width:100px; border: none; background-color:transparent; color: black;" value="`+pinState[0]+`"></td>
+                            <td align="center"><input onchange="editPin(this, 'pinnum',`+i+`)" type="text" id="node-input-name" style="width:40px; background-color:transparent; color: black; border: none; text-align: center;" value="`+pinState[1]+`"></td>
+                            <td><select onchange="editPin(this, 'pintype',`+i+`)" type="text" id="node-input-intype" style="width:60px;background-color:transparent; color: black; border: none;">
+                                <option value="cmd">CMD</option>
+                                <option selected value="info">INFO</option>
+                            </select></td>
+                            <td align="center"><input onchange="editPin(this, 'pindur',`+i+`)" type="text" id="node-input-name" style="width:40px; background-color:transparent; color: black; border: none; text-align: center;" value="`+pinState[3]+`"></td>
+                            <td><select onchange="editPin(this, 'inv',`+i+`)" type="text" id="node-input-intype" style="width:70px;background-color:transparent; color: black; border: none;">
+                                <option selected value="normal">Normal</option>
+                                <option value="inverted">Inverted</option>
+                            </select></td>
+                            </tr>`);
+                        }else{
+                            $("#signal-table").append(`<tr>
+                            <td><input onchange="editPin(this, 'pinname',`+i+`)" type="text" id="node-input-modname" style="width:100px; border: none; background-color:transparent; color: black;" value="`+pinState[0]+`"></td>
+                            <td align="center"><input onchange="editPin(this, 'pinnum',`+i+`)" type="text" id="node-input-name" style="width:40px; background-color:transparent; color: black; border: none; text-align: center;" value="`+pinState[1]+`"></td>
+                            <td><select onchange="editPin(this, 'pintype',`+i+`)" type="text" id="node-input-intype" style="width:60px;background-color:transparent; color: black; border: none;">
+                                <option value="cmd">CMD</option>
+                                <option selected value="info">INFO</option>
+                            </select></td>
+                            <td align="center"><input onchange="editPin(this, 'pindur',`+i+`)" type="text" id="node-input-name" style="width:40px; background-color:transparent; color: black; border: none; text-align: center;" value="`+pinState[3]+`"></td>
+                            <td><select onchange="editPin(this, 'inv',`+i+`)" type="text" id="node-input-intype" style="width:70px;background-color:transparent; color: black; border: none;">
+                                <option value="normal">Normal</option>
+                                <option selected value="inverted">Inverted</option>
+                            </select></td>
+                            </tr>`);
+                        }
                     }
                 }
             });
@@ -137,7 +235,7 @@
     </div>
     <div class="form-row">
         <label for="node-input-serialnum">Serial Number</label>
-        <input type="text" id="node-input-serialnum" placeholder="0x47A0">
+        <input type="text" id="node-input-serialnum" placeholder="BOMod01">
     </div>
     <div class="form-row">
         <label for="node-input-iono">Number of I/Os</label>
